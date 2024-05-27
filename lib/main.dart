@@ -1,5 +1,4 @@
 import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -31,6 +30,27 @@ class _CameraFolderScreenState extends State<CameraFolderScreen> {
   bool isLoading = true;
   String albumName = ''; // 폴더 이름을 저장할 변수 추가
 
+  final Map<AssetEntity, ValueNotifier<bool>> _selectedImages =
+      {}; // 선택된 이미지를 추적하는 맵
+
+  Widget _buildGridPart(List<AssetEntity> imageAssets) {
+    return GridView.builder(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 8,
+        crossAxisSpacing: 1.0,
+        mainAxisSpacing: 1.0,
+      ),
+      itemCount: imageAssets.length > 1 ? imageAssets.length - 1 : 0,
+      itemBuilder: (context, index) {
+        final asset = imageAssets[index];
+        final isSelected = _selectedImages.putIfAbsent(
+            asset, () => ValueNotifier<bool>(false));
+
+        return ImageTile(asset: asset, isSelected: isSelected);
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -60,9 +80,8 @@ class _CameraFolderScreenState extends State<CameraFolderScreen> {
     List<AssetPathEntity> albums = await PhotoManager.getAssetPathList(
       type: RequestType.image,
     );
-    int totalImages = await albums[0]
-        .assetCountAsync; // .assetCount; // 앨범에 있는 이미지의 총 수를 얻습니다.
-    // print('이미지 총수: $totalImages');
+
+    int totalImages = await albums[0].assetCountAsync; //  앨범에 있는 이미지의 총 갯수
     List<AssetEntity> images =
         await albums[0].getAssetListPaged(page: 0, size: totalImages);
 
@@ -70,7 +89,6 @@ class _CameraFolderScreenState extends State<CameraFolderScreen> {
       imageAssets = images;
       isLoading = false;
       albumName = albums[0].name; // 폴더 이름 저장
-//      albumName = '카메라'; // 폴더 이름 저장
     });
   }
 
@@ -88,43 +106,7 @@ class _CameraFolderScreenState extends State<CameraFolderScreen> {
             child: imageAssets.isNotEmpty
                 ? Row(
                     children: [
-                      Padding(
-                        padding:
-                            const EdgeInsets.only(left: 20), // 왼쪽에 20만큼 패딩 추가
-                        child: Expanded(
-                          child: SizedBox(
-                            height: 200,
-                            child: FutureBuilder<Uint8List?>(
-                              future: imageAssets[0]
-                                  .originBytes, // 첫 번째 이미지의 원본 데이터 사용
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                        ConnectionState.done &&
-                                    snapshot.data != null) {
-                                  return Image.memory(snapshot.data!,
-                                      fit: BoxFit.contain);
-                                } else {
-                                  return const Center(
-                                      child: CircularProgressIndicator());
-                                }
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                      Column(
-                        crossAxisAlignment:
-                            CrossAxisAlignment.start, // 텍스트를 오른쪽에 정렬
-                        children: [
-                          const SizedBox(height: 8),
-                          Text(albumName,
-                              style: const TextStyle(fontSize: 14)), // 폴더 이름 표시
-                          const SizedBox(height: 8),
-                          Text('이미지 ${imageAssets.length}개',
-                              style:
-                                  const TextStyle(fontSize: 10)), // 이미지 개수 표시
-                        ],
-                      ),
+                      _buildHeaderPart(albumName, imageAssets),
                     ],
                   )
                 : const Center(child: Text("이미지가 없습니다.")),
@@ -132,29 +114,101 @@ class _CameraFolderScreenState extends State<CameraFolderScreen> {
           // 이미지 그리드 리스트
           Expanded(
             flex: 5, // 나머지 이미지 목록
-            child: GridView.builder(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 8,
-                crossAxisSpacing: 1.0,
-                mainAxisSpacing: 1.0,
-              ),
-              itemCount: imageAssets.length > 1 ? imageAssets.length - 1 : 0,
-              itemBuilder: (context, index) {
-                // 0번째 이미지는 대표 이미지로 이미 사용됨, 따라서 1번째부터 시작
-                int assetIndex = index;
-                return FutureBuilder<Uint8List?>(
-                  future: imageAssets[assetIndex].thumbnailData,
-                  builder: (context, snapshot) {
-                    if (snapshot.data == null) {
-                      return Container(color: Colors.grey[300]);
-                    }
-                    return Image.memory(snapshot.data!, fit: BoxFit.cover);
-                  },
-                );
+            child: _buildGridPart(imageAssets),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+Widget _buildHeaderPart(String albumName, List<AssetEntity> imageAssets) {
+  return Row(
+    children: [
+      Padding(
+        padding: const EdgeInsets.only(left: 20), // 왼쪽에 20만큼 패딩 추가
+        child: Expanded(
+          child: SizedBox(
+            height: 200,
+            child: FutureBuilder<Uint8List?>(
+              future: imageAssets[0].originBytes, // 첫 번째 이미지의 원본 데이터 사용
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done &&
+                    snapshot.data != null) {
+                  return Image.memory(snapshot.data!, fit: BoxFit.contain);
+                } else {
+                  return const Center(child: CircularProgressIndicator());
+                }
               },
             ),
           ),
+        ),
+      ),
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start, // 텍스트를 오른쪽에 정렬
+        children: [
+          const SizedBox(height: 8),
+          Text(albumName, style: const TextStyle(fontSize: 14)), // 폴더 이름 표시
+          const SizedBox(height: 8),
+          Text('이미지 ${imageAssets.length}개',
+              style: const TextStyle(fontSize: 10)), // 이미지 개수 표시
         ],
+      ),
+    ],
+  );
+}
+
+class ImageTile extends StatefulWidget {
+  final AssetEntity asset;
+  final ValueNotifier<bool> isSelected;
+
+  const ImageTile({
+    required this.asset,
+    required this.isSelected,
+    super.key,
+  });
+
+  @override
+  State<ImageTile> createState() => _ImageTileState();
+}
+
+class _ImageTileState extends State<ImageTile> {
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onPanDown: (_) {
+        widget.isSelected.value = !widget.isSelected.value;
+      },
+      child: ValueListenableBuilder<bool>(
+        valueListenable: widget.isSelected,
+        builder: (context, isSelected, _) {
+          return FutureBuilder<Uint8List?>(
+            future: widget.asset.thumbnailData,
+            builder: (context, snapshot) {
+              if (snapshot.data == null) {
+                return Container(color: Colors.grey[300]);
+              }
+              return Stack(
+                fit: StackFit.expand,
+                children: [
+                  Image.memory(snapshot.data!, fit: BoxFit.cover),
+                  if (isSelected)
+                    Positioned(
+                        right: 0,
+                        bottom: 0,
+                        child: Container(
+                          color: Colors.blue.withOpacity(0.5),
+                          child: const Icon(
+                            Icons.check_circle,
+                            color: Colors.white,
+                            size: 15,
+                          ),
+                        )),
+                ],
+              );
+            },
+          );
+        },
       ),
     );
   }
