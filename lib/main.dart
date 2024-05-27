@@ -60,13 +60,17 @@ class _CameraFolderScreenState extends State<CameraFolderScreen> {
     List<AssetPathEntity> albums = await PhotoManager.getAssetPathList(
       type: RequestType.image,
     );
+    int totalImages = await albums[0]
+        .assetCountAsync; // .assetCount; // 앨범에 있는 이미지의 총 수를 얻습니다.
+    // print('이미지 총수: $totalImages');
     List<AssetEntity> images =
-        await albums[0].getAssetListPaged(page: 0, size: 100);
+        await albums[0].getAssetListPaged(page: 0, size: totalImages);
+
     setState(() {
       imageAssets = images;
       isLoading = false;
-//      albumName = albums[0].name; // 폴더 이름 저장
-      albumName = '카메라'; // 폴더 이름 저장
+      albumName = albums[0].name; // 폴더 이름 저장
+//      albumName = '카메라'; // 폴더 이름 저장
     });
   }
 
