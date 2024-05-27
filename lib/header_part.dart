@@ -1,16 +1,19 @@
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'dart:typed_data';
 import 'package:photo_manager/photo_manager.dart';
+import 'package:camera_folder_screen/selected_images_screen.dart';
 
 class HeaderPart extends StatelessWidget {
   final String albumName;
   final List<AssetEntity> imageAssets;
   final ValueNotifier<int> selectedCount;
+  final Map<AssetEntity, ValueNotifier<bool>> selectedImages;
 
   const HeaderPart({
     required this.albumName,
     required this.imageAssets,
     required this.selectedCount,
+    required this.selectedImages,
     super.key,
   });
 
@@ -50,8 +53,36 @@ class HeaderPart extends StatelessWidget {
             ValueListenableBuilder<int>(
               valueListenable: selectedCount,
               builder: (context, count, child) {
-                return Text('선택된 사진 $count개', // 선택된 사진의 개수 표시
-                    style: const TextStyle(fontSize: 10));
+                return SizedBox(
+                    height: 30, // 버튼의 높이를 20으로 설정
+                    child: TextButton(
+                      onPressed: count > 0
+                          ? () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => SelectedImagesScreen(
+                                    selectedImages: selectedImages,
+                                  ),
+                                ),
+                              );
+                            }
+                          : null,
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.blueAccent.shade100,
+                        disabledForegroundColor: Colors.grey
+                            .withOpacity(0.38), // 버튼이 disabled 상태일 때의 색상
+                        side: const BorderSide(
+                            color: Colors.black, width: 1), // 버튼의 테두리 설정
+                        shape: const RoundedRectangleBorder(
+                          // 버튼의 모양 설정
+                          borderRadius: BorderRadius.all(Radius.circular(5)),
+                        ),
+                      ),
+                      child: Text('선택된 사진 $count개', // 선택된 사진의 개수 표시
+                          style: const TextStyle(fontSize: 10)),
+                    ));
               },
             ),
           ],
