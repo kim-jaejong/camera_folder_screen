@@ -30,6 +30,9 @@ class _CameraFolderScreenState extends State<CameraFolderScreen> {
   bool isLoading = true;
   String albumName = ''; // 폴더 이름을 저장할 변수 추가
 
+  ValueNotifier<int> selectedCount =
+      ValueNotifier<int>(0); // 선택된 사진의 개수를 추적하는 변수 추가
+
   final Map<AssetEntity, ValueNotifier<bool>> _selectedImages =
       {}; // 선택된 이미지를 추적하는 맵
 
@@ -46,8 +49,65 @@ class _CameraFolderScreenState extends State<CameraFolderScreen> {
         final isSelected = _selectedImages.putIfAbsent(
             asset, () => ValueNotifier<bool>(false));
 
-        return ImageTile(asset: asset, isSelected: isSelected);
+        return ImageTile(
+          asset: asset,
+          isSelected: isSelected,
+          onSelectedChanged: (bool isSelected) {
+            // 선택 상태가 변경되면 selectedCount를 업데이트
+//            setState(() {
+            if (isSelected) {
+              selectedCount.value++;
+            } else {
+              selectedCount.value--;
+            }
+          },
+        );
       },
+    );
+  }
+
+  Widget _buildHeaderPart(String albumName, List<AssetEntity> imageAssets) {
+    return Row(
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 20), // 왼쪽에 20만큼 패딩 추가
+          child: Expanded(
+            child: SizedBox(
+              height: 200,
+              child: FutureBuilder<Uint8List?>(
+                future: imageAssets[0].originBytes, // 첫 번째 이미지의 원본 데이터 사용
+
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done &&
+                      snapshot.data != null) {
+                    return Image.memory(snapshot.data!, fit: BoxFit.contain);
+                  } else {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                },
+              ),
+            ),
+          ),
+        ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start, // 텍스트를 오른쪽에 정렬
+          children: [
+            const SizedBox(height: 8),
+            Text(albumName, style: const TextStyle(fontSize: 14)), // 폴더 이름 표시
+            const SizedBox(height: 8),
+            Text('전체 사진 ${imageAssets.length}개',
+                style: const TextStyle(fontSize: 10)), // 이미지 개수 표시
+            const SizedBox(height: 8),
+            ValueListenableBuilder<int>(
+              valueListenable: selectedCount,
+              builder: (context, count, child) {
+                return Text('선택된 사진 $count개', // 선택된 사진의 개수 표시
+                    style: const TextStyle(fontSize: 10));
+              },
+            ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -122,49 +182,15 @@ class _CameraFolderScreenState extends State<CameraFolderScreen> {
   }
 }
 
-Widget _buildHeaderPart(String albumName, List<AssetEntity> imageAssets) {
-  return Row(
-    children: [
-      Padding(
-        padding: const EdgeInsets.only(left: 20), // 왼쪽에 20만큼 패딩 추가
-        child: Expanded(
-          child: SizedBox(
-            height: 200,
-            child: FutureBuilder<Uint8List?>(
-              future: imageAssets[0].originBytes, // 첫 번째 이미지의 원본 데이터 사용
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done &&
-                    snapshot.data != null) {
-                  return Image.memory(snapshot.data!, fit: BoxFit.contain);
-                } else {
-                  return const Center(child: CircularProgressIndicator());
-                }
-              },
-            ),
-          ),
-        ),
-      ),
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.start, // 텍스트를 오른쪽에 정렬
-        children: [
-          const SizedBox(height: 8),
-          Text(albumName, style: const TextStyle(fontSize: 14)), // 폴더 이름 표시
-          const SizedBox(height: 8),
-          Text('이미지 ${imageAssets.length}개',
-              style: const TextStyle(fontSize: 10)), // 이미지 개수 표시
-        ],
-      ),
-    ],
-  );
-}
-
 class ImageTile extends StatefulWidget {
   final AssetEntity asset;
   final ValueNotifier<bool> isSelected;
+  final ValueChanged<bool> onSelectedChanged; // 선택 상태가 변경될 때 호출될 콜백 추가
 
   const ImageTile({
     required this.asset,
     required this.isSelected,
+    required this.onSelectedChanged, // 콜백을 생성자에서 받음
     super.key,
   });
 
@@ -177,8 +203,17 @@ class _ImageTileState extends State<ImageTile> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onPanDown: (_) {
-        widget.isSelected.value = !widget.isSelected.value;
+        final wasSelected = widget.isSelected.value;
+        widget.isSelected.value = !wasSelected;
+        widget.onSelectedChanged(!wasSelected); // 선택 상태가 변경되면 콜백 호출
       },
+      onPanUpdate: (_) {
+        if (!widget.isSelected.value) {
+          widget.isSelected.value = true;
+          widget.onSelectedChanged(true); // 선택 상태가 변경되면 콜백 호출
+        }
+      },
+      onLongPress: () {},
       child: ValueListenableBuilder<bool>(
         valueListenable: widget.isSelected,
         builder: (context, isSelected, _) {
@@ -188,6 +223,7 @@ class _ImageTileState extends State<ImageTile> {
               if (snapshot.data == null) {
                 return Container(color: Colors.grey[300]);
               }
+
               return Stack(
                 fit: StackFit.expand,
                 children: [
