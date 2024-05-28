@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
+import 'package:camera_folder_screen/full_screen_image_screen.dart';
 
 class ImageTile extends StatefulWidget {
   final AssetEntity asset;
@@ -33,7 +34,16 @@ class _ImageTileState extends State<ImageTile> {
           widget.onSelectedChanged(true); // 선택 상태가 변경되면 콜백 호출
         }
       },
-      onLongPress: () {},
+      onLongPress: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => FullScreenImageScreen(
+              asset: widget.asset,
+            ),
+          ),
+        );
+      },
       child: ValueListenableBuilder<bool>(
         valueListenable: widget.isSelected,
         builder: (context, isSelected, _) {
@@ -69,3 +79,34 @@ class _ImageTileState extends State<ImageTile> {
     );
   }
 }
+
+// class FullScreenImageScreen extends StatelessWidget {
+//   final AssetEntity asset;
+//
+//   const FullScreenImageScreen({
+//     required this.asset,
+//     super.key,
+//   });
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text('전체 이미지'),
+//       ),
+//       body: Center(
+//         child: FutureBuilder<Uint8List?>(
+//           future: asset.originBytes,
+//           builder: (context, snapshot) {
+//             if (snapshot.connectionState == ConnectionState.done &&
+//                 snapshot.data != null) {
+//               return Image.memory(snapshot.data!, fit: BoxFit.contain);
+//             } else {
+//               return const CircularProgressIndicator();
+//             }
+//           },
+//         ),
+//       ),
+//     );
+//   }
+// }

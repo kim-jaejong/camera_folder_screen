@@ -63,6 +63,8 @@ class HeaderPart extends StatelessWidget {
                                 MaterialPageRoute(
                                   builder: (context) => SelectedImagesScreen(
                                     selectedImages: selectedImages,
+                                    selectedCount:
+                                        selectedCount, // Add this line
                                   ),
                                 ),
                               );

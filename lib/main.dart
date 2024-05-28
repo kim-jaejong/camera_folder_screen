@@ -94,6 +94,7 @@ class _CameraFolderScreenState extends State<CameraFolderScreen> {
                     albumName: albumName,
                     imageAssets: imageAssets,
                     selectedCount: selectedCount,
+                    selectedImages: _selectedImages, // Add this line
                   )
                 : const Center(child: Text("이미지가 없습니다.")),
           ),
