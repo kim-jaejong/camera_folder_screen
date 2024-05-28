@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -29,13 +30,10 @@ class CameraFolderScreen extends StatefulWidget {
 class _CameraFolderScreenState extends State<CameraFolderScreen> {
   List<AssetEntity> imageAssets = [];
   bool isLoading = true;
-  String albumName = ''; // 폴더 이름을 저장할 변수 추가
+  String albumName = ''; // 폴더 이름
 
-  ValueNotifier<int> selectedCount =
-      ValueNotifier<int>(0); // 선택된 사진의 개수를 추적하는 변수 추가
-
-  final Map<AssetEntity, ValueNotifier<bool>> _selectedImages =
-      {}; // 선택된 이미지를 추적하는 맵
+  ValueNotifier<int> selectedCount = ValueNotifier<int>(0); // 선택된 사진의 개수를 추적
+  final Map<AssetEntity, ValueNotifier<bool>> _selectedImages = {}; // 선택 이미지 추적
 
   @override
   void initState() {
@@ -51,8 +49,7 @@ class _CameraFolderScreenState extends State<CameraFolderScreen> {
       setState(() {
         isLoading = false;
       });
-      // 권한이 거부되면 사용자에게 알리기
-      _showPermissionDeniedMessage();
+      _showPermissionDeniedMessage(); // 권한이 거부되면 사용자에게 알리기
     }
   }
 
@@ -67,6 +64,13 @@ class _CameraFolderScreenState extends State<CameraFolderScreen> {
       type: RequestType.image,
     );
 
+    // 각 앨범의 이름을 출력합니다.
+    for (var album in albums) {
+      if (kDebugMode) {
+        print('앨범 명: ${album.name}');
+      }
+    }
+
     int totalImages = await albums[0].assetCountAsync; //  앨범에 있는 이미지의 총 갯수
     List<AssetEntity> images =
         await albums[0].getAssetListPaged(page: 0, size: totalImages);
@@ -78,12 +82,11 @@ class _CameraFolderScreenState extends State<CameraFolderScreen> {
     });
   }
 
-  // Scaffold의 Body 수정 부분
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: const Text('카메라 이미지 목록', style: TextStyle(fontSize: 18))),
+          title: const Text('휴대폰 사진 앨범', style: TextStyle(fontSize: 18))),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center, // 중앙 정렬
         children: [
@@ -98,7 +101,6 @@ class _CameraFolderScreenState extends State<CameraFolderScreen> {
                   )
                 : const Center(child: Text("이미지가 없습니다.")),
           ),
-          // 이미지 그리드 리스트
           Expanded(
             flex: 5, // 나머지 이미지 목록
             child: GridPart(
