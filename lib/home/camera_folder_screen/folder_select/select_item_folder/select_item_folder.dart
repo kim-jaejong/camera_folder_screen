@@ -1,20 +1,23 @@
+import 'package:camera_folder_screen/camera_folder_screen.dart';
+import 'package:camera_folder_screen/custom/custom_app_bar.dart';
+import 'package:camera_folder_screen/right_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
-import 'package:camera_folder_screen/grid_part.dart';
-import 'package:camera_folder_screen/header_part.dart';
+import 'grid_part/grid_part.dart';
+import 'header_part/header_part.dart';
 
-class BodyPart extends StatefulWidget {
+class SelectItemFolder extends StatefulWidget {
   final AssetPathEntity album;
 
-  const BodyPart({super.key, required this.album});
+  const SelectItemFolder({super.key, required this.album});
 
   // 선택된 사진의 개수를 추적
 
   @override
-  State<BodyPart> createState() => _BodyPartState();
+  State<SelectItemFolder> createState() => _SelectItemFolderState();
 }
 
-class _BodyPartState extends State<BodyPart> {
+class _SelectItemFolderState extends State<SelectItemFolder> {
   List<AssetEntity> images = [];
   bool isLoading = true;
   String albumName = '';
@@ -41,11 +44,10 @@ class _BodyPartState extends State<BodyPart> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(albumName),
-      ),
+      endDrawer: const RightDrawer(),
+      appBar: CustomAppBar(title: albumName),
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.center, // 중앙 정렬
+        mainAxisAlignment: MainAxisAlignment.start, // 위젯을 위에서부터 정렬
         children: [
           Expanded(
             flex: 2, // 대표 이미지가 더 큰 공간을 차지하도록 설정
@@ -57,6 +59,10 @@ class _BodyPartState extends State<BodyPart> {
                     selectedImages: selectedImages,
                   )
                 : const Center(child: Text("이미지가 없습니다.")),
+          ),
+          const Expanded(
+            flex: 1, // 대표 이미지가 더 큰 공간을 차지하도록 설정
+            child: CameraFolderScreen(),
           ),
           Expanded(
             flex: 7, // 나머지 이미지 목록

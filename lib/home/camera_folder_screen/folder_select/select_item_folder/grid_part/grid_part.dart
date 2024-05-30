@@ -16,7 +16,6 @@ class GridPart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-//    final visibleAssets =  imageAssets.where((asset) => !selectedImages[asset]!.value).toList();
     return GridView.builder(
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 8,
@@ -25,8 +24,6 @@ class GridPart extends StatelessWidget {
       ),
       itemCount: imageAssets.length > 1 ? imageAssets.length - 1 : 0,
       itemBuilder: (context, index) {
-//        final asset = visibleAssets[index];
-//        final isSelected = selectedImages[asset]!;
         final asset = imageAssets[index];
         final isSelected =
             selectedImages.putIfAbsent(asset, () => ValueNotifier<bool>(false));
