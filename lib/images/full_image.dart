@@ -2,10 +2,10 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 
-class FullScreenImageScreen extends StatelessWidget {
+class FullImage extends StatelessWidget {
   final AssetEntity asset;
 
-  const FullScreenImageScreen({
+  const FullImage({
     required this.asset,
     super.key,
   });

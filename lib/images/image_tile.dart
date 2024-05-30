@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
-import 'package:camera_folder_screen/full_screen_image_screen.dart';
+import 'full_image.dart';
 
 class ImageTile extends StatefulWidget {
   final AssetEntity asset;
@@ -38,7 +38,7 @@ class _ImageTileState extends State<ImageTile> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => FullScreenImageScreen(
+            builder: (context) => FullImage(
               asset: widget.asset,
             ),
           ),
@@ -72,9 +72,9 @@ class _ImageTileState extends State<ImageTile> {
                         )),
                 ],
               );
-            },
+            }, // builder
           );
-        },
+        }, // builder
       ),
     );
   }

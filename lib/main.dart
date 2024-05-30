@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'theme.dart';
-import 'camera_folder_screen.dart';
+import 'folders/row_folders.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: theme(),
-      home: const CameraFolderScreen(),
+      home: const RowFolders(isHome: true),
     );
   }
 }
