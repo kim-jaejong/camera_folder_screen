@@ -8,7 +8,7 @@ class CustomTextButton extends StatelessWidget {
 
   const CustomTextButton({
     required this.text,
-    required this.onPressedFunction,
+    this.onPressedFunction,
     super.key,
   });
 
@@ -19,16 +19,16 @@ class CustomTextButton extends StatelessWidget {
       style: TextButton.styleFrom(
         foregroundColor: Colors.white,
         backgroundColor: Colors.blueAccent.shade100,
-        disabledForegroundColor: Colors.grey.withOpacity(0.38),
+        disabledForegroundColor: Colors.grey.withOpacity(0.1),
         // 버튼이 disabled 상태일 때의 색상
-        side: const BorderSide(color: Colors.black, width: 1),
+        side: const BorderSide(color: Colors.black, width: 0.3),
         // 버튼의 테두리 설정
         shape: const RoundedRectangleBorder(
           // 버튼의 모양 설정
           borderRadius: BorderRadius.all(Radius.circular(5)),
         ),
       ),
-      child: Text(text, style: const TextStyle(fontSize: 10)),
+      child: Text(text, style: const TextStyle(fontSize: 8)),
     );
   }
 }

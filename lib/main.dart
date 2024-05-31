@@ -1,6 +1,6 @@
+import 'home/home_page.dart';
 import 'package:flutter/material.dart';
 import 'theme.dart';
-import 'folders/row_folders.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: theme(),
-      home: const RowFolders(isHome: true),
+      home: const HomePage(),
     );
   }
 }
