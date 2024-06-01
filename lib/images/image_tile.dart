@@ -23,6 +23,7 @@ class _ImageTileState extends State<ImageTile> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+//      behavior: HitTestBehavior.values,
       onPanDown: (_) {
         final wasSelected = widget.isSelected.value;
         widget.isSelected.value = !wasSelected;
@@ -44,6 +45,7 @@ class _ImageTileState extends State<ImageTile> {
           ),
         );
       },
+
       child: ValueListenableBuilder<bool>(
         valueListenable: widget.isSelected,
         builder: (context, isSelected, _) {
@@ -53,7 +55,6 @@ class _ImageTileState extends State<ImageTile> {
               if (snapshot.data == null) {
                 return Container(color: Colors.grey[300]);
               }
-
               return Stack(
                 fit: StackFit.expand,
                 children: [

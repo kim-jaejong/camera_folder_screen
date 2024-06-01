@@ -10,7 +10,7 @@ class SelectedImages extends StatelessWidget {
 
   const SelectedImages({
     required this.selectedImages,
-    required this.selectedCount, // selectedCount를 인자로 받도록 수정
+    required this.selectedCount,
     super.key,
   });
 
@@ -26,7 +26,7 @@ class SelectedImages extends StatelessWidget {
       appBar: const CustomAppBar(title: '선택된 사진'),
       body: GridView.builder(
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 4,
+          crossAxisCount: 2,
           crossAxisSpacing: 1.0,
           mainAxisSpacing: 1.0,
         ),
