@@ -1,12 +1,8 @@
-import 'dart:typed_data';
-
-import 'package:camera_folder_screen/right_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
-import 'package:camera_folder_screen/folders/row_folders.dart';
-
-//import '../../../custom/custom_text.dart';
-import '../../../images/full_image.dart';
+import '../../../images/image_tile.dart';
+import '../../row_folders.dart';
+import '../../../right_drawer.dart';
 import '../../../images/selected_images.dart';
 
 class SelectItemFolder extends StatefulWidget {
@@ -46,28 +42,26 @@ class _SelectItemFolderState extends State<SelectItemFolder> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      endDrawer: const RightDrawer(),
-      appBar: AppBar(
-        title: albumName.isEmpty
-            ? const Text('Loading...', style: TextStyle(fontSize: 10))
-            : Text('폴더: $albumName(${images.length})',
-                style: const TextStyle(fontSize: 18)),
-        actions: [
-          IconButton(
-              icon: const Icon(Icons.shopping_cart),
-              onPressed: () {
-                // Navigator.pushNamed(context, '/cart');
-              }),
-        ],
-        bottom: const PreferredSize(
-          preferredSize: Size.fromHeight(0.5),
-          child: Divider(thickness: 0.5, height: 0.5, color: Colors.black),
+        endDrawer: const RightDrawer(),
+        appBar: AppBar(
+          title: albumName.isEmpty
+              ? const Text('Loading...', style: TextStyle(fontSize: 10))
+              : Text('폴더: $albumName(${images.length})',
+                  style: const TextStyle(fontSize: 18)),
+          actions: [
+            IconButton(
+                icon: const Icon(Icons.shopping_cart),
+                onPressed: () {
+                  // Navigator.pushNamed(context, '/cart');
+                })
+          ],
+          bottom: const PreferredSize(
+            preferredSize: Size.fromHeight(0.5),
+            child: Divider(thickness: 0.5, height: 0.5, color: Colors.black),
+          ),
+          centerTitle: true,
         ),
-        centerTitle: true,
-      ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start, // 위젯을 위에서부터 정렬
-        children: [
+        body: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
           const RowFolders(),
           const SizedBox(height: 10),
           Row(children: [
@@ -81,131 +75,73 @@ class _SelectItemFolderState extends State<SelectItemFolder> {
                         color: Colors.grey[300],
                         padding: const EdgeInsets.all(10),
                         child: InkWell(
-                          customBorder: const RoundedRectangleBorder(
-                              side: BorderSide(color: Colors.black, width: 1),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10))),
-                          onTap: selectedCount.value > 0
-                              ? () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => SelectedImages(
-                                        selectedImages: selectedImages,
-                                        selectedCount: selectedCount,
-                                      ),
-                                    ),
-                                  );
-                                }
-                              : null,
-                          child: Text('선택된 ${selectedCount.value} 개 사진 보기',
-                              style: const TextStyle(fontSize: 10)),
-                        ),
+                            onTap: selectedCount.value > 0
+                                ? () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                SelectedImages(
+                                                  selectedImages:
+                                                      selectedImages,
+                                                  selectedCount: selectedCount,
+                                                ))); // push 선택된 이미지 목록 보기
+                                  }
+                                : null,
+                            child: Text('선택된 ${selectedCount.value} 개 사진 보기',
+                                style: const TextStyle(fontSize: 10))),
                       );
               },
             ),
-
             const Spacer(), // Spacer 위젯 추가
-
             IconButton(
-              icon: const Icon(Icons.zoom_in_map),
-              onPressed: () {
-                if (_counter < 8) {
-                  setState(() {
-                    _counter++;
-                  });
-                }
-              },
-            ),
+                icon: const Icon(Icons.zoom_in_map),
+                onPressed: () {
+                  if (_counter < 8) {
+                    setState(() => _counter++);
+                  }
+                }),
             const SizedBox(width: 10),
             IconButton(
-              icon: const Icon(Icons.zoom_out_map),
-              onPressed: () {
-                if (_counter > 1) {
-                  setState(() {
-                    _counter--;
-                  });
-                }
-              },
-            ),
+                icon: const Icon(Icons.zoom_out_map),
+                onPressed: () {
+                  if (_counter > 1) {
+                    setState(() => _counter--);
+                  } //if
+                })
           ]),
           const SizedBox(height: 10),
           Expanded(
-            flex: 9, // 나머지 이미지 목록
-            child: GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: _counter,
-                crossAxisSpacing: 1.0,
-                mainAxisSpacing: 1.0,
-              ),
-              itemCount: images.length,
-              itemBuilder: (context, index) {
-                final asset = images[index];
-                final isSelected = selectedImages.putIfAbsent(
-                    asset, () => ValueNotifier<bool>(false));
-                return GestureDetector(
-                  onPanDown: (_) {
-                    final wasSelected = isSelected.value;
-                    isSelected.value = !wasSelected;
-                    if (wasSelected) {
-                      selectedCount.value--;
-                    } else {
-                      selectedCount.value++;
-                    }
-                  },
-                  onPanUpdate: (_) {
-                    if (!isSelected.value) {
-                      isSelected.value = true;
-                      selectedCount.value++;
-                    }
-                  },
-                  onLongPress: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => FullImage(
-                          asset: asset,
-                        ),
-                      ),
-                    );
-                  },
-                  child: ValueListenableBuilder<bool>(
-                    valueListenable: isSelected,
-                    builder: (context, isSelected, _) {
-                      return FutureBuilder<Uint8List?>(
-                        future: asset.thumbnailData,
-                        builder: (context, snapshot) {
-                          if (snapshot.data == null) {
-                            return Container(color: Colors.grey[300]);
-                          }
-                          return Stack(
-                            fit: StackFit.expand,
-                            children: [
-                              Image.memory(snapshot.data!, fit: BoxFit.cover),
-                              if (isSelected)
-                                Positioned(
-                                    right: 0,
-                                    bottom: 0,
-                                    child: Container(
-                                      color: Colors.blue.withOpacity(0.5),
-                                      child: const Icon(
-                                        Icons.check_circle,
-                                        color: Colors.white,
-                                        size: 15,
-                                      ),
-                                    )),
-                            ],
-                          );
-                        },
-                      );
+              flex: 9, // 나머지 이미지 목록
+              child: GridView.builder(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: _counter,
+                  crossAxisSpacing: 1.0,
+                  mainAxisSpacing: 1.0,
+                ),
+                itemCount: images.length,
+                itemBuilder: (context, index) {
+                  final asset = images[index];
+                  final isSelected = selectedImages.putIfAbsent(
+                      asset, () => ValueNotifier<bool>(false));
+                  return ImageTile(
+                    asset: asset,
+                    isSelected: isSelected,
+                    onSelectedChanged: (isSelectedNow) {
+                      if (isSelectedNow) {
+                        selectedCount.value++;
+                        selectedImages.putIfAbsent(
+                            asset,
+                            () => ValueNotifier<bool>(
+                                true)); // 이미지를 추가 선택하면 selectedImages에 다시 추가
+                      } else {
+                        selectedCount.value--;
+                        selectedImages.remove(asset); // 선택 해제된 이미지 제거
+                      }
                     },
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
+                  );
+                },
+              ))
+        ]));
   }
 }

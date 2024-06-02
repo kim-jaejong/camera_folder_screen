@@ -46,36 +46,38 @@ class _ImageTileState extends State<ImageTile> {
         );
       },
 
-      child: ValueListenableBuilder<bool>(
-        valueListenable: widget.isSelected,
-        builder: (context, isSelected, _) {
-          return FutureBuilder<Uint8List?>(
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          FutureBuilder<Uint8List?>(
             future: widget.asset.thumbnailData,
             builder: (context, snapshot) {
               if (snapshot.data == null) {
                 return Container(color: Colors.grey[300]);
               }
-              return Stack(
-                fit: StackFit.expand,
-                children: [
-                  Image.memory(snapshot.data!, fit: BoxFit.cover),
-                  if (isSelected)
-                    Positioned(
-                        right: 0,
-                        bottom: 0,
-                        child: Container(
-                          color: Colors.blue.withOpacity(0.5),
-                          child: const Icon(
-                            Icons.check_circle,
-                            color: Colors.white,
-                            size: 15,
-                          ),
-                        )),
-                ],
-              );
-            }, // builder
-          );
-        }, // builder
+              return Image.memory(snapshot.data!, fit: BoxFit.cover);
+            },
+          ),
+          ValueListenableBuilder<bool>(
+            valueListenable: widget.isSelected,
+            builder: (context, isSelected, _) {
+              return isSelected
+                  ? Positioned(
+                      right: 0,
+                      bottom: 0,
+                      child: Container(
+                        color: Colors.blue.withOpacity(0.5),
+                        child: const Icon(
+                          Icons.check_circle,
+                          color: Colors.white,
+                          size: 15,
+                        ),
+                      ),
+                    )
+                  : Container();
+            },
+          )
+        ],
       ),
     );
   }
