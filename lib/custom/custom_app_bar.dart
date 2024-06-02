@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../folders/row_folders.dart';
+import 'custom_icon.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -13,32 +14,25 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       leading: isHomeScreen
-          ? IconButton(
-              icon: const Icon(Icons.menu), // 메뉴 아이콘으로 변경
-              onPressed: () {
-                Scaffold.of(context).openDrawer(); // 메뉴 버튼을 누르면 드로어를 엽니다.
-              })
-          : IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
+          ? CustomIcon.getIcon(Icons.menu, () {
+              Scaffold.of(context).openDrawer();
+            })
+          : CustomIcon.getIcon(Icons.arrow_back, () {
+              Navigator.pop(context);
+            }),
       title: Row(
 //        mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          const Icon(Icons.camera_alt),
+          // const Icon(Icons.camera_alt),
           const SizedBox(width: 20),
           Text(title, style: const TextStyle(fontSize: 10)),
 //          const RowFolders(),
         ],
       ),
       actions: [
-        IconButton(
-            icon: const Icon(Icons.shopping_cart),
-            onPressed: () {
-              // Navigator.pushNamed(context, '/cart');
-            }),
+        CustomIcon.getIcon(Icons.shopping_cart, () {
+          // Navigator.pushNamed(context, '/cart');
+        }),
         const SizedBox(width: 16),
       ],
       bottom: const PreferredSize(

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
+import '../custom/custom_icon.dart';
 import '/images/image_tile.dart';
 import 'package:camera_folder_screen/right_drawer.dart';
-import 'package:camera_folder_screen/custom/custom_app_bar.dart';
 
-class SelectedImages extends StatelessWidget {
+class SelectedImages extends StatefulWidget {
   final Map<AssetEntity, ValueNotifier<bool>> selectedImages;
   final ValueNotifier<int> selectedCount; // 선택된 사진의 개수를 추적하는 변수 추가
 
@@ -15,6 +15,18 @@ class SelectedImages extends StatelessWidget {
   });
 
   @override
+  State<SelectedImages> createState() => _SelectedImagesState();
+}
+
+int _counter = 4;
+
+class _SelectedImagesState extends State<SelectedImages> {
+  Map<AssetEntity, ValueNotifier<bool>> get selectedImages =>
+      widget.selectedImages;
+
+  ValueNotifier<int> get selectedCount => widget.selectedCount;
+
+  @override
   Widget build(BuildContext context) {
     final selectedAssets = selectedImages.entries
         .where((entry) => entry.value.value)
@@ -23,10 +35,44 @@ class SelectedImages extends StatelessWidget {
 
     return Scaffold(
       endDrawer: const RightDrawer(),
-      appBar: const CustomAppBar(title: '선택된 사진'),
+      appBar: AppBar(
+        title: Text('선택된 사진(${selectedAssets.length})',
+            style: const TextStyle(fontSize: 10)),
+        actions: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              CustomIcon.getIcon(Icons.zoom_in_map, () {
+                if (_counter < 8) {
+                  setState(() => _counter++);
+                }
+              }),
+              const SizedBox(width: 1), // 간격 조절
+              CustomIcon.getIcon(Icons.zoom_out_map, () {
+                if (_counter > 1) {
+                  setState(() => _counter--);
+                }
+              }),
+              const SizedBox(width: 1), // 간격 조절
+              CustomIcon.getIcon(Icons.shopping_cart, () {
+                // Navigator.pushNamed(context, '/cart');
+              }),
+              const SizedBox(width: 1), // 간격 조절
+              CustomIcon.getIcon(Icons.delete, () {
+                // 휴지통 아이콘을 눌렀을 때의 동작을 여기에 작성합니다.
+              }),
+            ],
+          ),
+        ],
+        bottom: const PreferredSize(
+          preferredSize: Size.fromHeight(0.5),
+          child: Divider(thickness: 0.5, height: 0.5, color: Colors.black),
+        ),
+        centerTitle: true,
+      ),
       body: GridView.builder(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: _counter,
           crossAxisSpacing: 1.0,
           mainAxisSpacing: 1.0,
         ),

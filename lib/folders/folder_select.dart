@@ -1,7 +1,7 @@
 import 'package:camera_folder_screen/custom/custom_text.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
-import 'folder_select/select_item_folder/select_item_folder.dart';
+import 'folder_select/select_item_folder/stages.dart';
 
 class FolderSelect extends StatefulWidget {
   final List<AssetPathEntity> imageAssets;
@@ -30,7 +30,7 @@ class _FolderSelectState extends State<FolderSelect> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => SelectItemFolder(album: album),
+                      builder: (context) => Stages(album: album),
                     ),
                   ); //push
                 }, //onPressedFunction
