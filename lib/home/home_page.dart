@@ -23,30 +23,32 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       endDrawer: const RightDrawer(),
       appBar: const CustomAppBar(title: '휴대폰 사진 앨범', isHomeScreen: true),
-      body: Column(
-        children: [
-          const RowFolders(),
-          const SizedBox(height: 10),
-          Expanded(
-            child: ValueListenableBuilder<int>(
-              valueListenable: selectedIndex,
-              builder: (context, value, child) {
-                return IndexedStack(
-                  index: value,
-                  children: [
-                    CustomTextButton(
-                      text: '두번째',
-                      onPressedFunction: () {},
-                    ),
-                    const Text('3333333333333333'),
-                    const Text('444444444444444'),
-                    const Text('555555555555555'),
-                  ],
-                );
-              },
+      body: SafeArea(
+        child: Column(
+          children: [
+            const RowFolders(),
+            const SizedBox(height: 10),
+            Expanded(
+              child: ValueListenableBuilder<int>(
+                valueListenable: selectedIndex,
+                builder: (context, value, child) {
+                  return IndexedStack(
+                    index: value,
+                    children: [
+                      CustomTextButton(
+                        text: '두번째',
+                        onPressedFunction: () {},
+                      ),
+                      const Text('3333333333333333'),
+                      const Text('444444444444444'),
+                      const Text('555555555555555'),
+                    ],
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       bottomNavigationBar:
           CustomHomePageNavigationBar(selectedIndex: selectedIndex), //

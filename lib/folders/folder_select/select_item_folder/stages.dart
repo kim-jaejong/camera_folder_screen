@@ -49,9 +49,9 @@ class _StagesState extends State<Stages> {
           title: albumName.isEmpty
               ? const Text('Loading...', style: TextStyle(fontSize: 10))
               : Text('폴더: $albumName(${images.length})',
-                  style: const TextStyle(fontSize: 18)),
+                  style: const TextStyle(fontSize: 12)),
           actions: [
-            CustomIcon.getIcon(Icons.shopping_cart, () {
+            CustomIcon.getIcon(Icons.bookmark_add, 'HnPnA', () {
               // Navigator.pushNamed(context, '/cart');
             })
           ],
@@ -63,15 +63,16 @@ class _StagesState extends State<Stages> {
         ),
         body: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
           const RowFolders(),
-          const SizedBox(height: 10),
+          const SizedBox(height: 2),
           ValueListenableBuilder<int>(
             valueListenable: selectedCount,
             builder: (context, count, child) {
               return Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   if (count > 0) ...[
-                    CustomIcon.getIcon(Icons.grid_view, color: Colors.redAccent,
-                        () {
+                    CustomIcon.getIcon(
+                        Icons.grid_view, color: Colors.redAccent, '보기', () {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -80,7 +81,8 @@ class _StagesState extends State<Stages> {
                                     selectedCount: selectedCount,
                                   )));
                     }),
-                    CustomIcon.getIcon(Icons.sort, color: Colors.redAccent, () {
+                    CustomIcon.getIcon(
+                        Icons.sort, color: Colors.redAccent, '정렬', () {
                       setState(() {
                         images.sort((a, b) {
                           final aIsSelected = selectedImages[a]?.value ?? false;
@@ -89,17 +91,17 @@ class _StagesState extends State<Stages> {
                         });
                       });
                     }),
-                    CustomIcon.getIcon(Icons.delete, color: Colors.redAccent,
-                        () {
+                    CustomIcon.getIcon(
+                        Icons.delete, color: Colors.redAccent, '삭제', () {
                       // 휴지통 아이콘을 눌렀을 때의 동작을 여기에 작성합니다.
                     })
                   ],
-                  CustomIcon.getIcon(Icons.zoom_in_map, () {
+                  CustomIcon.getIcon(Icons.zoom_in_map, '작게', () {
                     if (_counter < 8) {
                       setState(() => _counter++);
                     }
                   }),
-                  CustomIcon.getIcon(Icons.zoom_out_map, () {
+                  CustomIcon.getIcon(Icons.zoom_out_map, '크게', () {
                     if (_counter > 1) {
                       setState(() => _counter--);
                     }
@@ -108,7 +110,7 @@ class _StagesState extends State<Stages> {
               );
             },
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 2),
           Expanded(
               flex: 9, // 나머지 이미지 목록
               child: GridView.builder(

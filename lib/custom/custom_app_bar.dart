@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../folders/row_folders.dart';
+//import '../folders/row_folders.dart';
 import 'custom_icon.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -14,26 +13,26 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       leading: isHomeScreen
-          ? CustomIcon.getIcon(Icons.menu, () {
+          ? CustomIcon.getIcon(Icons.menu, '메뉴', () {
               Scaffold.of(context).openDrawer();
             })
-          : CustomIcon.getIcon(Icons.arrow_back, () {
+          : CustomIcon.getIcon(Icons.arrow_back, '뒤로', () {
               Navigator.pop(context);
             }),
       title: Row(
 //        mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           // const Icon(Icons.camera_alt),
-          const SizedBox(width: 20),
-          Text(title, style: const TextStyle(fontSize: 10)),
+//          const SizedBox(width: 10),
+          Text(title, style: const TextStyle(fontSize: 12)),
 //          const RowFolders(),
         ],
       ),
       actions: [
-        CustomIcon.getIcon(Icons.shopping_cart, () {
+        CustomIcon.getIcon(Icons.bookmark_add, 'HnPnA', () {
           // Navigator.pushNamed(context, '/cart');
         }),
-        const SizedBox(width: 16),
+        //      const SizedBox(width: 16),
       ],
       bottom: const PreferredSize(
         preferredSize: Size.fromHeight(0.5),

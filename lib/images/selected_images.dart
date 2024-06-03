@@ -42,23 +42,23 @@ class _SelectedImagesState extends State<SelectedImages> {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              CustomIcon.getIcon(Icons.zoom_in_map, () {
+              CustomIcon.getIcon(Icons.zoom_in_map, '축소', () {
                 if (_counter < 8) {
                   setState(() => _counter++);
                 }
               }),
-              const SizedBox(width: 1), // 간격 조절
-              CustomIcon.getIcon(Icons.zoom_out_map, () {
+//              const SizedBox(width: 1), // 간격 조절
+              CustomIcon.getIcon(Icons.zoom_out_map, '확대', () {
                 if (_counter > 1) {
                   setState(() => _counter--);
                 }
               }),
-              const SizedBox(width: 1), // 간격 조절
-              CustomIcon.getIcon(Icons.shopping_cart, () {
+              //       const SizedBox(width: 1), // 간격 조절
+              CustomIcon.getIcon(Icons.bookmark_add, 'HnPnA', () {
                 // Navigator.pushNamed(context, '/cart');
               }),
-              const SizedBox(width: 1), // 간격 조절
-              CustomIcon.getIcon(Icons.delete, () {
+              //  const SizedBox(width: 1), // 간격 조절
+              CustomIcon.getIcon(Icons.delete, '삭제', () {
                 // 휴지통 아이콘을 눌렀을 때의 동작을 여기에 작성합니다.
               }),
             ],
