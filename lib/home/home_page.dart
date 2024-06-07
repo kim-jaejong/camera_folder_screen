@@ -34,14 +34,12 @@ class _HomePageState extends State<HomePage> {
                 builder: (context, value, child) {
                   return IndexedStack(
                     index: value,
-                    children: [
-                      CustomTextButton(
-                        text: '두번째',
-                        onPressedFunction: () {},
-                      ),
-                      const Text('3333333333333333'),
-                      const Text('444444444444444'),
-                      const Text('555555555555555'),
+                    children: const [
+                      Text('111111111111111'),
+                      Text('222222222222222'),
+                      Text('3333333333333333'),
+                      Text('444444444444444'),
+                      Text('555555555555555'),
                     ],
                   );
                 },

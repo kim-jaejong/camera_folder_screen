@@ -1,17 +1,18 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
+//import 'metadata.dart';
 import 'full_image.dart';
 
 class ImageTile extends StatefulWidget {
   final AssetEntity asset;
   final ValueNotifier<bool> isSelected;
-  final ValueChanged<bool> onSelectedChanged; // 선택 상태가 변경될 때 호출될 콜백 추가
+  final ValueChanged<bool> onSelectedChanged;
 
   const ImageTile({
     required this.asset,
     required this.isSelected,
-    required this.onSelectedChanged, // 콜백을 생성자에서 받음
+    required this.onSelectedChanged,
     super.key,
   });
 
@@ -26,23 +27,25 @@ class _ImageTileState extends State<ImageTile> {
       onPanDown: (_) {
         final wasSelected = widget.isSelected.value;
         widget.isSelected.value = !wasSelected;
-        widget.onSelectedChanged(!wasSelected); // 선택 상태가 변경되면 콜백 호출
+        widget.onSelectedChanged(!wasSelected);
       },
       onPanUpdate: (_) {
         if (!widget.isSelected.value) {
           widget.isSelected.value = true;
-          widget.onSelectedChanged(true); // 선택 상태가 변경되면 콜백 호출
+          widget.onSelectedChanged(true);
         }
       },
       onLongPress: () {
         Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => FullImage(
-              asset: widget.asset,
-            ),
-          ),
-        );
+            context,
+            MaterialPageRoute(
+              builder: (context) => FullImage(
+                asset: widget.asset,
+              ),
+//              builder: (context) => Metadata(
+//                    asset: widget.asset,
+//                  ),
+            ));
       },
       child: Stack(
         fit: StackFit.expand,

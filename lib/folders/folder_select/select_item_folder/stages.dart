@@ -51,6 +51,16 @@ class _StagesState extends State<Stages> {
               : Text('폴더: $albumName(${images.length})',
                   style: const TextStyle(fontSize: 12)),
           actions: [
+            CustomIcon.getIcon(Icons.zoom_in_map, '작게', () {
+              if (_counter < 8) {
+                setState(() => _counter++);
+              }
+            }),
+            CustomIcon.getIcon(Icons.zoom_out_map, '크게', () {
+              if (_counter > 1) {
+                setState(() => _counter--);
+              }
+            }),
             CustomIcon.getIcon(Icons.bookmark_add, 'HnPnA', () {
               // Navigator.pushNamed(context, '/cart');
             })
@@ -68,11 +78,11 @@ class _StagesState extends State<Stages> {
             valueListenable: selectedCount,
             builder: (context, count, child) {
               return Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   if (count > 0) ...[
                     CustomIcon.getIcon(
-                        Icons.grid_view, color: Colors.redAccent, '보기', () {
+                        Icons.grid_view, color: Colors.redAccent, '선택', () {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -92,20 +102,10 @@ class _StagesState extends State<Stages> {
                       });
                     }),
                     CustomIcon.getIcon(
-                        Icons.delete, color: Colors.redAccent, '삭제', () {
+                        Icons.delete, color: Colors.redAccent, '제거', () {
                       // 휴지통 아이콘을 눌렀을 때의 동작을 여기에 작성합니다.
                     })
                   ],
-                  CustomIcon.getIcon(Icons.zoom_in_map, '작게', () {
-                    if (_counter < 8) {
-                      setState(() => _counter++);
-                    }
-                  }),
-                  CustomIcon.getIcon(Icons.zoom_out_map, '크게', () {
-                    if (_counter > 1) {
-                      setState(() => _counter--);
-                    }
-                  })
                 ],
               );
             },

@@ -18,7 +18,7 @@ class SelectedImages extends StatefulWidget {
   State<SelectedImages> createState() => _SelectedImagesState();
 }
 
-int _counter = 4;
+int _counter = 2;
 
 class _SelectedImagesState extends State<SelectedImages> {
   Map<AssetEntity, ValueNotifier<bool>> get selectedImages =>
@@ -42,18 +42,16 @@ class _SelectedImagesState extends State<SelectedImages> {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              CustomIcon.getIcon(Icons.zoom_in_map, '축소', () {
+              CustomIcon.getIcon(Icons.zoom_in_map, '작게', () {
                 if (_counter < 8) {
                   setState(() => _counter++);
                 }
               }),
-//              const SizedBox(width: 1), // 간격 조절
-              CustomIcon.getIcon(Icons.zoom_out_map, '확대', () {
+              CustomIcon.getIcon(Icons.zoom_out_map, '크게', () {
                 if (_counter > 1) {
                   setState(() => _counter--);
                 }
               }),
-              //       const SizedBox(width: 1), // 간격 조절
               CustomIcon.getIcon(Icons.bookmark_add, 'HnPnA', () {
                 // Navigator.pushNamed(context, '/cart');
               }),
@@ -66,7 +64,7 @@ class _SelectedImagesState extends State<SelectedImages> {
         ],
         bottom: const PreferredSize(
           preferredSize: Size.fromHeight(0.5),
-          child: Divider(thickness: 0.5, height: 0.5, color: Colors.black),
+          child: Divider(thickness: 1, height: 0.5, color: Colors.black),
         ),
         centerTitle: true,
       ),

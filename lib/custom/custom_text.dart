@@ -28,7 +28,7 @@ class CustomTextButton extends StatelessWidget {
           borderRadius: BorderRadius.all(Radius.circular(5)),
         ),
       ),
-      child: Text(text, style: const TextStyle(fontSize: 8)),
+      child: Text(text, style: const TextStyle(fontSize: 12)),
     );
   }
 }
