@@ -1,7 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../custom/custom_text.dart';
+
+//import '../../custom/custom_text.dart';
 import 'package:path_provider/path_provider.dart';
 
 class GroupedImagePicker extends StatefulWidget {
@@ -23,7 +24,7 @@ class _GroupedImagePickerState extends State<GroupedImagePicker> {
 
     final picker = ImagePicker();
     final pickedFiles =
-        await picker.pickMultiImage(maxWidth: 200, maxHeight: 200);
+        await picker.pickMultiImage(); //maxWidth: 200, maxHeight: 200);
 
     for (final pickedFile in pickedFiles) {
       final file = File(pickedFile.path);
@@ -39,36 +40,40 @@ class _GroupedImagePickerState extends State<GroupedImagePicker> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    //_pickImages();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text(
-            '앨범 선택',
-            style: TextStyle(fontSize: 12),
-          ),
-          actions: [
-            // IconButton(
-            //   icon: const Icon(Icons.photo_library),
-            //   onPressed: _pickImages,
-            // ),
-            IconButton(
-              icon: Icon(_isGridView ? Icons.list : Icons.grid_on),
-              onPressed: () {
-                setState(() {
-                  _isGridView = !_isGridView;
-                });
-              },
+            title: const Text(
+              '앨범 선택',
+              style: TextStyle(fontSize: 12),
             ),
-          ],
-        ),
+            actions: [
+              IconButton(
+                  icon: Icon(_isGridView ? Icons.list : Icons.grid_on),
+                  onPressed: () {
+                    setState(() {
+                      _isGridView = !_isGridView;
+                    });
+                  })
+            ]),
         body: _isLoading
             ? const Center(child: CircularProgressIndicator())
             : _selectedImages.isEmpty
-                ? CustomTextButton(
-                    text: '앨범 선택',
-                    onPressedFunction: () {
+                ? InkWell(
+                    onTap: () {
                       _pickImages();
-                    })
+                    },
+                    child: const SizedBox(
+                        height: 25,
+                        child: Text('휴대폰 사진 선택하기.',
+                            style: TextStyle(
+                                fontSize: 12, fontWeight: FontWeight.bold))))
                 : _isGridView
                     ? _buildGridView()
                     : _buildListView());
@@ -77,7 +82,7 @@ class _GroupedImagePickerState extends State<GroupedImagePicker> {
   Widget _buildGridView() {
     return GridView.builder(
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 8,
+        crossAxisCount: 2,
         crossAxisSpacing: 2,
         mainAxisSpacing: 2,
       ),

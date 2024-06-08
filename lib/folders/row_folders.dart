@@ -26,10 +26,14 @@ class _RowFoldersState extends State<RowFolders> {
     _fetchAssets();
   }
 
+  bool isGranted = false;
+
   Future<void> _fetchAssets() async {
     try {
       imageAssets = await assetsManager.requestPermissionsAndFetchAssets();
-      if (assetsManager.isGranted) {
+      isGranted = assetsManager.isGranted;
+      //     isGranted = false;
+      if (isGranted) {
         setState(() {
           isLoading = false;
         });
@@ -45,7 +49,7 @@ class _RowFoldersState extends State<RowFolders> {
 
   @override
   Widget build(BuildContext context) {
-    return assetsManager.isGranted
+    return isGranted
         ? Column(children: [
             SizedBox(
                 height: 40,
@@ -69,18 +73,7 @@ class _RowFoldersState extends State<RowFolders> {
                               ));
                     }))
           ])
-        :
-        // CustomTextButton(
-        //         text: '앨범 선택',
-        //         onPressedFunction: () {
-        //           Navigator.push(
-        //               context,
-        //               MaterialPageRoute(
-        //                 builder: (context) => const GroupedImagePicker(),
-        //               )); //push
-        //         } //onPressedFunction
-        //         );
-        InkWell(
+        : InkWell(
             onTap: () {
               Navigator.push(
                   context,
@@ -90,6 +83,8 @@ class _RowFoldersState extends State<RowFolders> {
             },
             child: const SizedBox(
                 height: 25,
-                child: Text('앨범 선택', style: TextStyle(fontSize: 10))));
+                child: Text('앨범 사진 선택',
+                    style:
+                        TextStyle(fontSize: 12, fontWeight: FontWeight.bold))));
   }
 }

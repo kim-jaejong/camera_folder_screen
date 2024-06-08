@@ -1,6 +1,6 @@
 // home_page.dart
 import '../custom/custom_home_page_navigation_bar.dart';
-import '../custom/custom_text.dart';
+//import '../custom/custom_text.dart';
 //import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../../custom/custom_app_bar.dart';
