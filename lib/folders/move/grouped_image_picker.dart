@@ -1,9 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-
-//import '../../custom/custom_text.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 class GroupedImagePicker extends StatefulWidget {
   const GroupedImagePicker({super.key});
@@ -29,8 +28,8 @@ class _GroupedImagePickerState extends State<GroupedImagePicker> {
     for (final pickedFile in pickedFiles) {
       final file = File(pickedFile.path);
       if (!_selectedImages.contains(file.path)) {
-        // Check if the image is already in the list
-        _selectedImages.add(file.path); // original image file
+        _selectedImages.add(file.path);
+        print('파일경로 ${file.path}');
       }
     }
 
@@ -49,19 +48,35 @@ class _GroupedImagePickerState extends State<GroupedImagePicker> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-            title: const Text(
-              '앨범 선택',
-              style: TextStyle(fontSize: 12),
+          title: const Text(
+            '앨범 선택',
+            style: TextStyle(fontSize: 12),
+          ),
+          actions: [
+            IconButton(
+              icon: Icon(_isGridView ? Icons.list : Icons.grid_on),
+              onPressed: () {
+                setState(() {
+                  _isGridView = !_isGridView;
+                });
+              },
             ),
-            actions: [
-              IconButton(
-                  icon: Icon(_isGridView ? Icons.list : Icons.grid_on),
-                  onPressed: () {
-                    setState(() {
-                      _isGridView = !_isGridView;
-                    });
-                  })
-            ]),
+            IconButton(
+              icon: const Icon(Icons.share),
+              onPressed: () async {
+                if (_selectedImages.isNotEmpty) {
+                  List<XFile> xFiles =
+                      _selectedImages.map((path) => XFile(path)).toList();
+                  await Share.shareXFiles(xFiles, text: '선택된 이미지를 보냅니다!');
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('공유할 이미지가 선택되지 않았습니다.')),
+                  );
+                }
+              },
+            ),
+          ],
+        ),
         body: _isLoading
             ? const Center(child: CircularProgressIndicator())
             : _selectedImages.isEmpty
@@ -82,7 +97,7 @@ class _GroupedImagePickerState extends State<GroupedImagePicker> {
   Widget _buildGridView() {
     return GridView.builder(
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
+        crossAxisCount: 6,
         crossAxisSpacing: 2,
         mainAxisSpacing: 2,
       ),
@@ -105,17 +120,17 @@ class _GroupedImagePickerState extends State<GroupedImagePicker> {
       },
     );
   }
-}
 
-Future<void> saveImage(context, file) async {
+  Future<void> saveImage(context, file) async {
 //  Save the image to the hnpna directory
-  final directory = await getApplicationDocumentsDirectory();
-  final path = '${directory.path}/hnpna';
-  final newDirectory = await Directory(path)
-      .create(recursive: true); // Creates the directory if it doesn't exist
-  final newPath = '${newDirectory.path}/${file.path.split('/').last}';
-  await file.copy(newPath); // Copies the image file to the new directory
-  ScaffoldMessenger.of(context).showSnackBar(
-    const SnackBar(content: Text('Images saved successfully!')),
-  );
+    final directory = await getApplicationDocumentsDirectory();
+    final path = '${directory.path}/hnpna';
+    final newDirectory = await Directory(path)
+        .create(recursive: true); // Creates the directory if it doesn't exist
+    final newPath = '${newDirectory.path}/${file.path.split('/').last}';
+    await file.copy(newPath); // Copies the image file to the new directory
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Images saved successfully!')),
+    );
+  }
 }

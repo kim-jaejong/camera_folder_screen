@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../../custom/custom_icon.dart';
 import '../../../images/image_tile.dart';
 import '../../row_folders.dart';
@@ -19,6 +20,7 @@ class _StagesState extends State<Stages> {
   List<AssetEntity> images = [];
   bool isLoading = true;
   String albumName = '';
+
   final ValueNotifier<int> selectedCount = ValueNotifier<int>(0); // 선택된 갯수 추적
   final Map<AssetEntity, ValueNotifier<bool>> selectedImages = {}; // 선택 이미지 추적
 
@@ -41,6 +43,43 @@ class _StagesState extends State<Stages> {
 
   int _counter = 4;
 
+  void _showDlg(List<XFile> xFiles) {
+    // 공유 기능을 다이얼로그로 구현
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('공유'),
+          content: const Text('선택된 사진을 공유하시겠습니까?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('취소'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('공유'),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await Share.shareXFiles(xFiles, text: '선택된 사진을 보냅니다!');
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // void _firstStage(List<AssetEntity> assets) {
+  //   for (var asset in assets) {
+  //     if (asset.name == 'Camera') {
+  //       Stages(album: asset);
+  //       break;
+  //     }
+  //   }
+  // }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,16 +90,6 @@ class _StagesState extends State<Stages> {
               : Text('폴더: $albumName(${images.length})',
                   style: const TextStyle(fontSize: 12)),
           actions: [
-            CustomIcon.getIcon(Icons.zoom_in_map, '작게', () {
-              if (_counter < 8) {
-                setState(() => _counter++);
-              }
-            }),
-            CustomIcon.getIcon(Icons.zoom_out_map, '크게', () {
-              if (_counter > 1) {
-                setState(() => _counter--);
-              }
-            }),
             CustomIcon.getIcon(Icons.bookmark_add, 'HnPnA', () {
               // Navigator.pushNamed(context, '/cart');
             })
@@ -72,7 +101,7 @@ class _StagesState extends State<Stages> {
           centerTitle: true,
         ),
         body: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-          const RowFolders(),
+          const RowFolders(), // 앨범 선택 화면으로 이동
           const SizedBox(height: 2),
           ValueListenableBuilder<int>(
             valueListenable: selectedCount,
@@ -97,14 +126,42 @@ class _StagesState extends State<Stages> {
                         images.sort((a, b) {
                           final aIsSelected = selectedImages[a]?.value ?? false;
                           final bIsSelected = selectedImages[b]?.value ?? false;
+                          if (aIsSelected && bIsSelected) {
+                            // 둘 다 선택된 이미지라면 날짜로 정렬
+                            return a.createDateTime.compareTo(b.createDateTime);
+                          }
                           return (bIsSelected ? 1 : 0) - (aIsSelected ? 1 : 0);
                         });
                       });
                     }),
-                    CustomIcon.getIcon(
-                        Icons.delete, color: Colors.redAccent, '제거', () {
-                      // 휴지통 아이콘을 눌렀을 때의 동작을 여기에 작성합니다.
-                    })
+                    CustomIcon.getIcon(Icons.zoom_in_map, '작게', () {
+                      if (_counter < 8) {
+                        setState(() => _counter++);
+                      }
+                    }),
+                    CustomIcon.getIcon(Icons.zoom_out_map, '크게', () {
+                      if (_counter > 1) {
+                        setState(() => _counter--);
+                      }
+                    }),
+                    CustomIcon.getIcon(Icons.folder, '폴더', () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const RowFolders()));
+                    }),
+                    CustomIcon.getIcon(Icons.share, '공유', () async {
+                      List<XFile> xFiles = [];
+                      for (var asset in selectedImages.keys) {
+                        if (selectedImages[asset]!.value) {
+                          var file = await asset.file;
+                          xFiles.add(XFile(file!.path));
+                          print('파일경로 ${file.path}');
+                        }
+                      }
+                      print('파일 길이 : ${xFiles.length}');
+                      _showDlg(xFiles);
+                    }),
                   ],
                 ],
               );

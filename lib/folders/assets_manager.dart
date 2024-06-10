@@ -10,7 +10,6 @@ class AssetsManager {
   Future<List<AssetPathEntity>> requestPermissionsAndFetchAssets() async {
     print('접근 진입');
     var storageStatus = await Permission.storage.request();
-//    var photosStatus = await Permission.photos.request();
     if (storageStatus.isGranted) {
       //&& photosStatus.isGranted) {
       print('접근 허용');

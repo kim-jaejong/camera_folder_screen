@@ -1,6 +1,8 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
+import 'package:intl/intl.dart';
+
 //import 'metadata.dart';
 import 'full_image.dart';
 
@@ -42,9 +44,6 @@ class _ImageTileState extends State<ImageTile> {
               builder: (context) => FullImage(
                 asset: widget.asset,
               ),
-//              builder: (context) => Metadata(
-//                    asset: widget.asset,
-//                  ),
             ));
       },
       child: Stack(
@@ -62,20 +61,32 @@ class _ImageTileState extends State<ImageTile> {
           ValueListenableBuilder<bool>(
             valueListenable: widget.isSelected,
             builder: (context, isSelected, _) {
-              return isSelected
-                  ? Positioned(
-                      right: 0,
-                      bottom: 0,
-                      child: Container(
-                        color: Colors.blue.withOpacity(0.5),
-                        child: const Icon(
-                          Icons.check_circle,
-                          color: Colors.white,
-                          size: 15,
-                        ),
-                      ),
-                    )
-                  : Container();
+              return Positioned(
+                  right: 0,
+                  bottom: 0,
+                  child: Container(
+                    color: isSelected
+                        ? Colors.blue.withOpacity(0.5)
+                        : Colors.transparent,
+                    child: Row(
+                      children: [
+                        Text(
+                            DateFormat('yy.MM.dd HH:mm')
+                                .format(widget.asset.createDateTime),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 8,
+                            )),
+                        if (isSelected)
+                          const Icon(
+                            Icons.check_circle,
+                            color: Colors.white,
+                            size: 15,
+                          ),
+                      ],
+                    ),
+                  ));
+//                  : Container();
             },
           )
         ],

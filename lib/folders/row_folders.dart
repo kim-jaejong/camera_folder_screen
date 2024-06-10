@@ -32,6 +32,7 @@ class _RowFoldersState extends State<RowFolders> {
     try {
       imageAssets = await assetsManager.requestPermissionsAndFetchAssets();
       isGranted = assetsManager.isGranted;
+//================================================================================================
       //     isGranted = false;
       if (isGranted) {
         setState(() {
