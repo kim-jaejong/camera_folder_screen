@@ -32,8 +32,14 @@ class _StagesState extends State<Stages> {
 
   Future<void> _fetchImages() async {
     int totalImages = await widget.album.assetCountAsync; //  앨범에 있는 이미지의 총 갯수
-    List<AssetEntity> assets =
-        await widget.album.getAssetListPaged(page: 0, size: totalImages);
+    List<AssetEntity> assets = await widget.album.getAssetListPaged(
+      page: 0,
+      size: totalImages,
+    );
+
+    // 이미지를 날짜의 내림차순으로 정렬
+    assets.sort((a, b) => b.createDateTime.compareTo(a.createDateTime));
+
     setState(() {
       images = assets;
       isLoading = false;
@@ -71,132 +77,119 @@ class _StagesState extends State<Stages> {
     );
   }
 
-  // void _firstStage(List<AssetEntity> assets) {
-  //   for (var asset in assets) {
-  //     if (asset.name == 'Camera') {
-  //       Stages(album: asset);
-  //       break;
-  //     }
-  //   }
-  // }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        endDrawer: const RightDrawer(),
-        appBar: AppBar(
-          title: albumName.isEmpty
-              ? const Text('Loading...', style: TextStyle(fontSize: 10))
-              : Text('폴더: $albumName(${images.length})',
-                  style: const TextStyle(fontSize: 12)),
-          actions: [
-            CustomIcon.getIcon(Icons.bookmark_add, 'HnPnA', () {
-              // Navigator.pushNamed(context, '/cart');
-            })
-          ],
-          bottom: const PreferredSize(
-            preferredSize: Size.fromHeight(0.5),
-            child: Divider(thickness: 0.5, height: 0.5, color: Colors.black),
-          ),
-          centerTitle: true,
+      endDrawer: const RightDrawer(),
+      appBar: AppBar(
+        title: albumName.isEmpty
+            ? const Text('Loading...', style: TextStyle(fontSize: 10))
+            : Text('$albumName(${images.length})',
+                style: const TextStyle(fontSize: 12)),
+        actions: [],
+        bottom: const PreferredSize(
+          preferredSize: Size.fromHeight(0.5),
+          child: Divider(thickness: 0.5, height: 0.5, color: Colors.black),
         ),
-        body: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-          const RowFolders(), // 앨범 선택 화면으로 이동
-          const SizedBox(height: 2),
-          ValueListenableBuilder<int>(
-            valueListenable: selectedCount,
-            builder: (context, count, child) {
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  if (count > 0) ...[
-                    CustomIcon.getIcon(
-                        Icons.grid_view, color: Colors.redAccent, '선택', () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => SelectedImages(
-                                    selectedImages: selectedImages,
-                                    selectedCount: selectedCount,
-                                  )));
-                    }),
-                    CustomIcon.getIcon(
-                        Icons.sort, color: Colors.redAccent, '정렬', () {
-                      setState(() {
-                        images.sort((a, b) {
-                          final aIsSelected = selectedImages[a]?.value ?? false;
-                          final bIsSelected = selectedImages[b]?.value ?? false;
-                          if (aIsSelected && bIsSelected) {
-                            // 둘 다 선택된 이미지라면 날짜로 정렬
-                            return a.createDateTime.compareTo(b.createDateTime);
-                          }
-                          return (bIsSelected ? 1 : 0) - (aIsSelected ? 1 : 0);
-                        });
-                      });
-                    }),
-                    CustomIcon.getIcon(Icons.zoom_in_map, '작게', () {
-                      if (_counter < 8) {
-                        setState(() => _counter++);
+        centerTitle: true,
+      ),
+      body: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+        const RowFolders(), // 앨범 선택 화면으로 이동
+        const SizedBox(height: 2),
+        ValueListenableBuilder<int>(
+          valueListenable: selectedCount,
+          builder: (context, count, child) {
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+//                if (count > 0) ...[
+                CustomIcon.getIcon(
+                    Icons.remove_red_eye_outlined,
+                    color: Colors.redAccent,
+                    '선택', () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => SelectedImages(
+                              selectedImages: selectedImages,
+                              selectedCount: selectedCount)));
+                }),
+                CustomIcon.getIcon(Icons.sort, color: Colors.redAccent, '정렬',
+                    () {
+                  setState(() {
+                    images.sort((a, b) {
+                      final aIsSelected = selectedImages[a]?.value ?? false;
+                      final bIsSelected = selectedImages[b]?.value ?? false;
+                      if (aIsSelected && bIsSelected) {
+                        return a.createDateTime.compareTo(b.createDateTime);
                       }
-                    }),
-                    CustomIcon.getIcon(Icons.zoom_out_map, '크게', () {
-                      if (_counter > 1) {
-                        setState(() => _counter--);
-                      }
-                    }),
-                    CustomIcon.getIcon(Icons.folder, '폴더', () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const RowFolders()));
-                    }),
-                    CustomIcon.getIcon(Icons.share, '공유', () async {
-                      List<XFile> xFiles = [];
-                      for (var asset in selectedImages.keys) {
-                        if (selectedImages[asset]!.value) {
-                          var file = await asset.file;
-                          xFiles.add(XFile(file!.path));
-                          print('파일경로 ${file.path}');
+                      return (bIsSelected ? 1 : 0) - (aIsSelected ? 1 : 0);
+                    });
+                  });
+                }),
+                CustomIcon.getIcon(Icons.zoom_in_map, '작게', () {
+                  if (_counter < 8) {
+                    setState(() => _counter++);
+                  }
+                }),
+                CustomIcon.getIcon(Icons.zoom_out_map, '크게', () {
+                  if (_counter > 1) {
+                    setState(() => _counter--);
+                  }
+                }),
+                CustomIcon.getIcon(Icons.folder, '폴더', () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const RowFolders()));
+                }),
+                CustomIcon.getIcon(Icons.share, '공유', () async {
+                  List<XFile> xFiles = [];
+                  for (var asset in selectedImages.keys) {
+                    if (selectedImages[asset]!.value) {
+                      var file = await asset.file;
+                      xFiles.add(XFile(file!.path));
+                      print('파일경로 ${file.path}');
+                    }
+                  }
+                  print('파일 길이 : ${xFiles.length}');
+                  _showDlg(xFiles);
+                }),
+                //              ],
+              ],
+            );
+          },
+        ),
+        Expanded(
+            flex: 9, // 나머지 이미지 목록
+            child: GridView.builder(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: _counter,
+                  crossAxisSpacing: 2.0,
+                  mainAxisSpacing: 2.0,
+                ),
+                itemCount: images.length,
+                itemBuilder: (context, index) {
+                  final asset = images[index];
+                  final isSelected = selectedImages.putIfAbsent(
+                      asset, () => ValueNotifier<bool>(false));
+                  return ImageTile(
+                      asset: asset,
+                      isSelected: isSelected,
+                      onSelectedChanged: (isSelectedNow) {
+                        if (isSelectedNow) {
+                          selectedCount.value++;
+                          selectedImages.putIfAbsent(
+                              asset,
+                              () => ValueNotifier<bool>(
+                                  true)); // 이미지를 추가 선택하면 selectedImages에 다시 추가
+                        } else {
+                          selectedCount.value--;
+                          selectedImages.remove(asset); // 선택 해제된 이미지 제거
                         }
-                      }
-                      print('파일 길이 : ${xFiles.length}');
-                      _showDlg(xFiles);
-                    }),
-                  ],
-                ],
-              );
-            },
-          ),
-          const SizedBox(height: 2),
-          Expanded(
-              flex: 9, // 나머지 이미지 목록
-              child: GridView.builder(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: _counter,
-                    crossAxisSpacing: 1.0,
-                    mainAxisSpacing: 1.0,
-                  ),
-                  itemCount: images.length,
-                  itemBuilder: (context, index) {
-                    final asset = images[index];
-                    final isSelected = selectedImages.putIfAbsent(
-                        asset, () => ValueNotifier<bool>(false));
-                    return ImageTile(
-                        asset: asset,
-                        isSelected: isSelected,
-                        onSelectedChanged: (isSelectedNow) {
-                          if (isSelectedNow) {
-                            selectedCount.value++;
-                            selectedImages.putIfAbsent(
-                                asset,
-                                () => ValueNotifier<bool>(
-                                    true)); // 이미지를 추가 선택하면 selectedImages에 다시 추가
-                          } else {
-                            selectedCount.value--;
-                            selectedImages.remove(asset); // 선택 해제된 이미지 제거
-                          }
-                        });
-                  }))
-        ]));
+                      });
+                }))
+      ]),
+    );
   }
 }

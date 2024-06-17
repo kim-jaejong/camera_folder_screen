@@ -62,19 +62,17 @@ class _ImageTileState extends State<ImageTile> {
             valueListenable: widget.isSelected,
             builder: (context, isSelected, _) {
               return Positioned(
-                  right: 0,
-                  bottom: 0,
+                  left: 0,
+                  top: 0,
                   child: Container(
-                    color: isSelected
-                        ? Colors.blue.withOpacity(0.5)
-                        : Colors.transparent,
+                    color: isSelected ? Colors.blue : Colors.white,
                     child: Row(
                       children: [
                         Text(
-                            DateFormat('yy.MM.dd HH:mm')
+                            DateFormat(' yy.MM.dd ')
                                 .format(widget.asset.createDateTime),
                             style: const TextStyle(
-                              color: Colors.white,
+                              color: Colors.black,
                               fontSize: 8,
                             )),
                         if (isSelected)

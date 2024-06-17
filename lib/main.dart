@@ -1,9 +1,13 @@
+import 'package:provider/provider.dart';
 import 'home/home_page.dart';
 import 'package:flutter/material.dart';
 import 'theme.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(ChangeNotifierProvider(
+    create: (context) => AlbumProvider(),
+    child: const MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {

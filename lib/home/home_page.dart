@@ -1,11 +1,26 @@
 // home_page.dart
+import 'package:flutter/services.dart';
+import 'package:photo_manager/photo_manager.dart';
+import '../custom/custom_app_bar.dart';
 import '../custom/custom_home_page_navigation_bar.dart';
-//import '../custom/custom_text.dart';
-//import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import '../../custom/custom_app_bar.dart';
-import '../../right_drawer.dart';
-import '../folders/row_folders.dart';
+import '../folders/folder_select/select_item_folder/stages.dart';
+//import '../folders/row_folders.dart';
+import '../folders/permission_manager.dart';
+import 'package:provider/provider.dart';
+
+import '../right_drawer.dart';
+
+class AlbumProvider with ChangeNotifier {
+  late List<AssetPathEntity> _albums = [];
+
+  List<AssetPathEntity> get albums => _albums;
+
+  void setAlbums(List<AssetPathEntity> albums) {
+    _albums = albums;
+    notifyListeners();
+  }
+}
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,41 +30,47 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final selectedIndex =
-      ValueNotifier<int>(0); // Replace _selectedIndex with a ValueNotifier
+  final selectedIndex = ValueNotifier<int>(0);
+  PermissionManager permission = PermissionManager();
+  late Widget stagesWidget;
+
+  @override
+  void initState() {
+    super.initState();
+    permission.requestPermissions().then((isGranted) {
+      if (!isGranted) {
+        permission.showPermissionMessage(context);
+        SystemNavigator.pop();
+      } else {
+        _getAlbums();
+      }
+    });
+  }
+
+  Future<void> _getAlbums() async {
+    var albumProvider = Provider.of<AlbumProvider>(context, listen: false);
+    var albums = await permission.fetchAssets();
+    albumProvider.setAlbums(albums);
+    if (albums.isNotEmpty) {
+      stagesWidget = Stages(album: albums[0]);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    var albumProvider = Provider.of<AlbumProvider>(context);
+    var imageAssets = albumProvider.albums;
+
     return Scaffold(
-      endDrawer: const RightDrawer(),
-      appBar: const CustomAppBar(title: '휴대폰 사진 앨범', isHomeScreen: true),
+//      endDrawer: const RightDrawer(),
+//      appBar: const CustomAppBar(title: '휴대폰 사진 앨범', isHomeScreen: true),
       body: SafeArea(
-        child: Column(
-          children: [
-            const RowFolders(),
-            const SizedBox(height: 10),
-            Expanded(
-              child: ValueListenableBuilder<int>(
-                valueListenable: selectedIndex,
-                builder: (context, value, child) {
-                  return IndexedStack(
-                    index: value,
-                    children: const [
-                      Text('111111111111111'),
-                      Text('222222222222222'),
-                      Text('3333333333333333'),
-                      Text('444444444444444'),
-                      Text('555555555555555'),
-                    ],
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
+        child: imageAssets.isNotEmpty
+            ? stagesWidget
+            : const CircularProgressIndicator(),
       ),
       bottomNavigationBar:
-          CustomHomePageNavigationBar(selectedIndex: selectedIndex), //
+          CustomHomePageNavigationBar(selectedIndex: selectedIndex),
     );
   }
 }
